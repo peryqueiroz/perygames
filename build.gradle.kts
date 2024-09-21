@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+	implementation("de.huxhorn.sulky:de.huxhorn.sulky.ulid:8.2.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

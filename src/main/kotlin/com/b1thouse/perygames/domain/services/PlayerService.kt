@@ -1,7 +1,7 @@
 package com.b1thouse.perygames.domain.services
 
 import com.b1thouse.perygames.domain.entities.Player
-import com.b1thouse.perygames.domain.exceptions.PlayerNotFoundException
+import com.b1thouse.perygames.domain.exceptions.NotFoundException
 import com.b1thouse.perygames.domain.gateways.PlayerStorageGateway
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +15,7 @@ class PlayerService(
     fun findById(id: Long): Player {
         return playerStorageGateway.getById(id)?.also {
             logger.info("Found player by id=$id")
-        } ?: throw PlayerNotFoundException(message = "Player not found by id=$id").also {
+        } ?: throw NotFoundException(message = "Player not found by id=$id").also {
             logger.info(it.message)
         }
     }
@@ -23,7 +23,7 @@ class PlayerService(
     fun findByGameId(gameId: String): Player? {
         return playerStorageGateway.getByGameId(gameId)?.also {
             logger.info("Found player by gameId=$gameId")
-        } ?: throw PlayerNotFoundException(message = "Player not found by gameId=$gameId").also {
+        } ?: throw NotFoundException(message = "Player not found by gameId=$gameId").also {
             logger.info(it.message)
         }
     }

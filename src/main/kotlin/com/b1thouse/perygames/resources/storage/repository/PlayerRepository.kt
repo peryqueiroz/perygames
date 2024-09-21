@@ -10,7 +10,6 @@ import org.springframework.data.repository.CrudRepository
 import java.time.LocalDateTime
 
 interface PlayerRepository: CrudRepository<PlayerTable, Long> {
-
     fun findByGameId(gameId: String?): PlayerTable?
 }
 

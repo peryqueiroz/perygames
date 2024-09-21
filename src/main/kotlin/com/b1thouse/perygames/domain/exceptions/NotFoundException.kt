@@ -1,6 +1,6 @@
 package com.b1thouse.perygames.domain.exceptions
 
-data class PlayerNotFoundException(
+class NotFoundException(
     override val type: TypeError = TypeError.NOT_FOUND,
     override val message: String = type.message
 ): BaseException()
