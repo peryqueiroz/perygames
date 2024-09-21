@@ -23,7 +23,7 @@ class PlayerStorage(
         return playerRepository.save(player.toTable()).toDomain()
     }
 
-    override fun getById(id: Long): Player? {
+    override fun getById(id: String): Player? {
         logger.info("get player by id=$id")
         return playerRepository.findByIdOrNull(id)?.toDomain()
     }

@@ -12,7 +12,7 @@ class PlayerService(
     private val playerStorageGateway: PlayerStorageGateway
 ) {
 
-    fun findById(id: Long): Player {
+    fun findById(id: String): Player {
         return playerStorageGateway.getById(id)?.also {
             logger.info("Found player by id=$id")
         } ?: throw NotFoundException(message = "Player not found by id=$id").also {

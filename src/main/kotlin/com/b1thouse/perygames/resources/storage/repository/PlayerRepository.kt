@@ -9,14 +9,14 @@ import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
 import java.time.LocalDateTime
 
-interface PlayerRepository: CrudRepository<PlayerTable, Long> {
+interface PlayerRepository: CrudRepository<PlayerTable, String> {
     fun findByGameId(gameId: String?): PlayerTable?
 }
 
 
 @Table(name = "player")
 data class PlayerTable(
-    @Id private val id: Long,
+    @Id private val id: String,
     val gameId: String?,
     val name: String,
     val nick: String?,
@@ -26,7 +26,7 @@ data class PlayerTable(
     val avatar: String? = null,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
-): Persistable<Long> {
+): Persistable<String> {
 
     @Transient
     private var new: Boolean = false

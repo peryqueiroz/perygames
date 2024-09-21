@@ -17,7 +17,7 @@ class PlayerController(
 ) {
 
     @GetMapping("/{playerId}")
-    fun getPlayerById(@PathVariable("playerId") playerId: Long): ResponseEntity<PlayerResponse> {
+    fun getPlayerById(@PathVariable("playerId") playerId: String): ResponseEntity<PlayerResponse> {
         return playerService.findById(playerId).let {
             val response = it.toPlayerResponse()
             ResponseEntity.status(HttpStatus.OK).body(response)

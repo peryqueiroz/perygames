@@ -1,6 +1,7 @@
 package com.b1thouse.perygames.resources.storage.repository
 
 import com.b1thouse.perygames.domain.entities.Match
+import com.b1thouse.perygames.domain.entities.enums.Award
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.domain.Persistable
@@ -46,7 +47,7 @@ data class MatchTable(
         kill = match.kill,
         death = match.death,
         assist = match.assist,
-        award = match.award,
+        award = match.award?.value,
         imp = match.imp,
         hero = match.hero,
         startDate = match.startDate,
@@ -67,7 +68,7 @@ data class MatchTable(
         kill = kill,
         death = death,
         assist = assist,
-        award = award,
+        award = award?.let { Award.valueOf(it) },
         imp = imp,
         hero = hero,
         startDate = startDate,

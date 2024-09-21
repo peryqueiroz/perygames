@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS player (
-    "id" int NOT NULL,
+    "id" VARCHAR(26) NOT NULL,
     "game_id" VARCHAR(26) NULL,
     "name" varchar(26) NOT NULL,
     "nick" varchar(255) NULL,
