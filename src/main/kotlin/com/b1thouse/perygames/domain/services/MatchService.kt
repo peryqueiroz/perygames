@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class MatchService(
     private val matchStorageGateway: MatchStorageGateway
 ) {
-    fun findById(id: Long): Match {
+    fun findById(id: String): Match {
         return matchStorageGateway.getById(id)?.also {
             logger.info("Found match by id=$id")
         } ?: throw NotFoundException(message = "Match not found by id=$id").also {
