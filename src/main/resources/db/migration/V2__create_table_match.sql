@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS match (
     "id" VARCHAR(26) NOT NULL,
     "game_id" VARCHAR(26) NULL,
+    "player_id" VARCHAR(26) NULL,
     "win" BOOLEAN NULL,
     "kill" INT NULL,
     "death" INT NULL,

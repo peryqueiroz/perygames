@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 data class Match(
     val id: String = ULID().nextULID(),
     val gameId: String,
+    val playerId: String,
     val win: Boolean,
     val kill: Int,
     val death: Int,

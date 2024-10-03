@@ -17,6 +17,7 @@ interface MatchRepository: CrudRepository<MatchTable, String>{
 data class MatchTable(
     @Id private val id: String,
     val gameId: String,
+    val playerId: String,
     val win: Boolean,
     val kill: Int,
     val death: Int,
@@ -43,6 +44,7 @@ data class MatchTable(
     constructor(match: Match, new: Boolean = false) : this (
         id = match.id,
         gameId = match.gameId,
+        playerId = match.playerId,
         win = match.win,
         kill = match.kill,
         death = match.death,
@@ -64,6 +66,7 @@ data class MatchTable(
     fun toDomain() = Match(
         id = id,
         gameId = gameId,
+        playerId = playerId,
         win = win,
         kill = kill,
         death = death,
