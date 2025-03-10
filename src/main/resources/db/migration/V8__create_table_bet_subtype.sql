@@ -1,6 +1,7 @@
-CREATE TABLE IF NOT EXISTS bet_type (
+CREATE TABLE IF NOT EXISTS bet_subtype (
     "id" VARCHAR(26) NOT NULL,
-    "type" VARCHAR(26) NULL,
+    "subtype" VARCHAR(26),
+    "odd" decimal(5,2),
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY("id")

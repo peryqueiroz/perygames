@@ -18,3 +18,7 @@ CREATE TABLE IF NOT EXISTS match (
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY("id")
 );
+
+
+ALTER TABLE match DROP CONSTRAINT IF EXISTS match__player_fk;
+ALTER TABLE match ADD CONSTRAINT match__player_fk FOREIGN KEY ("player_id") REFERENCES player("id");

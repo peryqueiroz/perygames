@@ -1,16 +1,17 @@
 CREATE TABLE IF NOT EXISTS bet (
     "id" VARCHAR(26) NOT NULL,
-    "user_id" VARCHAR(26) NULL,
-    "match_id" varchar(26) NULL,
-    "nick" varchar(255) NULL,
-    "smurf" BOOLEAN NULL,
-    "ranking" INT NULL,
-    "medal" varchar(26) NULL,
-    "avatar" varchar(255) NULL,
+    "user_id" VARCHAR(26) NOT NULL,
+    "match_id" varchar(26),
+    "status" VARCHAR(26) NOT NULL,
+    "amount_bet" DECIMAL(10,2),
+    "amount_return" DECIMAL(10,2),
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY("id")
 );
 
-ALTER TABLE user_bet DROP CONSTRAINT IF EXISTS user_bet__player_fk;
-ALTER TABLE user_bet ADD CONSTRAINT user_bet__player_fk FOREIGN KEY ("player_id") REFERENCES player("id");
+ALTER TABLE bet DROP CONSTRAINT IF EXISTS bet__user_bet_fk;
+ALTER TABLE bet ADD CONSTRAINT bet__user_bet_fk FOREIGN KEY ("user_id") REFERENCES user_bet("id");
+
+ALTER TABLE bet DROP CONSTRAINT IF EXISTS bet__match_fk;
+ALTER TABLE bet ADD CONSTRAINT bet__match_fk FOREIGN KEY ("match_id") REFERENCES match("id");

@@ -17,8 +17,6 @@ interface BetTypeRepository: CrudRepository<BetTypeTable, String> {
 data class BetTypeTable(
     @Id private val id: String,
     val type: String?,
-    val subtype: String?,
-    val odd: BigDecimal?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ): Persistable<String> {
@@ -33,8 +31,6 @@ data class BetTypeTable(
     constructor(betType: BetType, new: Boolean = false) : this (
         id = betType.id,
         type = betType.type,
-        subtype = betType.subtype,
-        odd = betType.odd,
         createdAt = betType.createdAt,
         updatedAt = if (new) betType.createdAt else LocalDateTime.now()
     ) {
@@ -44,8 +40,6 @@ data class BetTypeTable(
     fun toDomain() = BetType(
         id = id,
         type = type,
-        subtype = subtype,
-        odd = odd,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

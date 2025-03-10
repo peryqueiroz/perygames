@@ -1,6 +1,6 @@
 package com.b1thouse.perygames.resources.storage.repository
 
-import com.b1thouse.perygames.domain.entities.User
+import com.b1thouse.perygames.domain.entities.UserBet
 import com.b1thouse.perygames.domain.entities.enums.UserStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -34,7 +34,7 @@ data class UserTable(
 
     override fun isNew() = new
 
-    constructor(user: User, new: Boolean = false) : this (
+    constructor(user: UserBet, new: Boolean = false) : this (
     id = user.id,
     playerId = user.playerId,
     status = user.status,
@@ -47,7 +47,7 @@ data class UserTable(
         this.new = new
     }
 
-    fun toDomain() = User(
+    fun toDomain() = UserBet(
         id = id,
         playerId = playerId,
         status = status,
@@ -59,4 +59,4 @@ data class UserTable(
     )
 }
 
-fun User.toTable(new: Boolean = false) = UserTable(this, new)
+fun UserBet.toTable(new: Boolean = false) = UserTable(this, new)

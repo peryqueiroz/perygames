@@ -1,10 +1,10 @@
 package com.b1thouse.perygames.domain.gateways
 
-import com.b1thouse.perygames.domain.entities.User
+import com.b1thouse.perygames.domain.entities.UserBet
 
 interface UserStorageGateway {
 
-    fun create(user: User): User
-    fun update(user: User): User
-    fun getById(id: String): User?
+    fun create(user: UserBet): UserBet
+    fun update(user: UserBet): UserBet
+    fun getById(id: String): UserBet?
 }
