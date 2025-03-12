@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class ExceptionHandler {
-
+/*
     @ExceptionHandler(value = [Exception::class])
     fun defaultHandler(ex: Exception): ResponseEntity<ErrorResponse> {
         logger.error("Exception Handled ex=$ex")
@@ -43,4 +43,6 @@ class ExceptionHandler {
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(ExceptionHandler::class.java)
     }
+
+ */
 }

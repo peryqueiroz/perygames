@@ -5,13 +5,25 @@ import com.b1thouse.perygames.domain.entities.enums.UserStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.domain.Persistable
+import org.springframework.data.jdbc.repository.query.Modifying
+import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.relational.core.mapping.Table
 import org.springframework.data.repository.CrudRepository
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 interface UserRepository: CrudRepository<UserTable, String> {
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE user_bet ub set ub.balance = ub.balance + :amount WHERE ub.id = :userId")
+    fun depositBalance(userId: String, amount: BigDecimal)
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE user_bet ub set ub.balance = ub.balance - :amount WHERE ub.id = :userId")
+    fun withdrawBalance(userId: String, amount: BigDecimal)
 }
 
 

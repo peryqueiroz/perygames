@@ -6,5 +6,6 @@ abstract class BaseException(override val cause: Throwable? = null): RuntimeExce
 }
 
 enum class TypeError(val message: String) {
-    NOT_FOUND("Not found")
+    NOT_FOUND("Not found"),
+    INVALID_AMOUNT("Invalid Amount")
 }

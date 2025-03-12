@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS account (
+    "id" VARCHAR(26) UNIQUE NOT NULL,
+    "login" VARCHAR(50) NOT NULL UNIQUE,
+    "passwrd" TEXT NOT NULL,
+    "role" VARCHAR(26) NOT NULL,
+    PRIMARY KEY("id")
+);
