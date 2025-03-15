@@ -6,6 +6,7 @@ import java.time.LocalDateTime
 
 data class BetSubtype(
     val id: String = ULID().nextULID(),
+    val typeId: String,
     val subtype: String?,
     val odd: BigDecimal?,
     val createdAt: LocalDateTime,
