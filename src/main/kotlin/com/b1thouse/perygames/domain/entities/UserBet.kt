@@ -11,7 +11,7 @@ data class UserBet(
     val status: UserStatus,
     val email: String?,
     val password: String?,
-    val balance: BigDecimal? = BigDecimal.ZERO,
+    val balance: BigDecimal = BigDecimal.ZERO,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )

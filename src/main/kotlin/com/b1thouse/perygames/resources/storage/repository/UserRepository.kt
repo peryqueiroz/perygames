@@ -1,6 +1,7 @@
 package com.b1thouse.perygames.resources.storage.repository
 
 import com.b1thouse.perygames.domain.entities.UserBet
+import com.b1thouse.perygames.domain.entities.enums.BetStatus
 import com.b1thouse.perygames.domain.entities.enums.UserStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -34,7 +35,7 @@ data class UserTable(
     val status: UserStatus,
     val email: String?,
     val password: String?,
-    val balance: BigDecimal?,
+    val balance: BigDecimal,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ): Persistable<String> {

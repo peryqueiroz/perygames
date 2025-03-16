@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 
 interface BetRepository: CrudRepository<BetTable, String> {
 
+    fun findByUserIdAndStatusIn(userId: String?, status: List<String>): List<Bet>
 }
 
 @Table(name = "bet")

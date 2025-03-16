@@ -1,6 +1,6 @@
 package com.b1thouse.perygames.application.web.controller
 
-import com.b1thouse.perygames.domain.services.AccountService
+import com.b1thouse.perygames.domain.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -13,7 +13,7 @@ import java.math.BigDecimal
 @Controller
 @RequestMapping("v1/user")
 class UserController(
-    private val userService: AccountService
+    private val userService: UserService
 ) {
     @PostMapping("/{userId}/deposit")
     fun deposit(@PathVariable("userId") userId: String,

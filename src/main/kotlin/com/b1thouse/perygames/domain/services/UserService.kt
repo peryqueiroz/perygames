@@ -1,6 +1,8 @@
 package com.b1thouse.perygames.domain.services
 
+import com.b1thouse.perygames.domain.entities.UserBet
 import com.b1thouse.perygames.domain.exceptions.InvalidAmountException
+import com.b1thouse.perygames.domain.exceptions.NotFoundException
 import com.b1thouse.perygames.domain.gateways.UserStorageGateway
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -8,9 +10,18 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
 @Service
-class AccountService(
-    private val userStorageGateway: UserStorageGateway
+class UserService(
+    private val userStorageGateway: UserStorageGateway,
 ) {
+
+    fun getById(userId: String): UserBet {
+        return userStorageGateway.findById(userId)?.also {
+            logger.info("Found user by id=$userId")
+        } ?: throw NotFoundException(message = "User not found by id=$userId").also {
+            logger.info(it.message)
+        }
+    }
+
     fun deposit(userId: String, amount: BigDecimal) {
         if(amount <= BigDecimal.ZERO) {
             throw InvalidAmountException(
@@ -26,7 +37,7 @@ class AccountService(
     }
 
 /*    fun withdraw(userId: String, request:  ): BigDecimal? {
-        val user = userStorageGateway.getById(userId)
+        val user = userStorageGateway.findById(userId)
             ?: throw NotFoundException(message = "UserId $userId not found")
 
         if(amo)
@@ -40,6 +51,6 @@ class AccountService(
     }
 */
     companion object {
-        private val logger: Logger = LoggerFactory.getLogger(AccountService::class.java)
+        private val logger: Logger = LoggerFactory.getLogger(UserService::class.java)
     }
 }

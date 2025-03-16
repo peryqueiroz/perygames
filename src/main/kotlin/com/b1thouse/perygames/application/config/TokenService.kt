@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.b1thouse.perygames.domain.entities.AuthUser
+import com.b1thouse.perygames.domain.exceptions.InvalidTokenException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -38,7 +39,7 @@ class TokenService {
                 .verify(token)
                 .subject
         } catch (exception: JWTVerificationException) {
-            ""
+            throw InvalidTokenException(message = "Token is invalid or expired.")
         }
     }
 

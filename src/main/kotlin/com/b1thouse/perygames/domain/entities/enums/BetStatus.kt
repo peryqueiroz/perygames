@@ -4,5 +4,15 @@ enum class BetStatus {
     CANCELED,
     PENDING,
     FINISH,
-    CREATED
+    CREATED;
+
+    fun isPending(): Boolean {
+        return this == PENDING || this == CREATED
+    }
+
+    companion object {
+        fun getPendingStatus(): List<BetStatus> {
+            return entries.filter { it.isPending() }
+        }
+    }
 }

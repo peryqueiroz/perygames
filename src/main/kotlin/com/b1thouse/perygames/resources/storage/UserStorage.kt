@@ -20,7 +20,7 @@ class UserStorage(
         return userRepository.save(user.toTable()).toDomain()
     }
 
-    override fun getById(id: String): UserBet? {
+    override fun findById(id: String): UserBet? {
         return userRepository.findByIdOrNull(id)?.toDomain()
     }
 
@@ -31,5 +31,4 @@ class UserStorage(
     override fun withdrawBalance(userId: String, amount: BigDecimal) {
         return userRepository.withdrawBalance(userId, amount)
     }
-
 }

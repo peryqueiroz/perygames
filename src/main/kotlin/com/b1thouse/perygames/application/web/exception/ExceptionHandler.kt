@@ -2,6 +2,7 @@ package com.b1thouse.perygames.application.web.exception
 
 import com.b1thouse.perygames.domain.exceptions.BaseException
 import com.b1thouse.perygames.domain.exceptions.ErrorResponse
+import com.b1thouse.perygames.domain.exceptions.InvalidTokenException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 
 @ControllerAdvice
 class ExceptionHandler {
-/*
+
     @ExceptionHandler(value = [Exception::class])
     fun defaultHandler(ex: Exception): ResponseEntity<ErrorResponse> {
         logger.error("Exception Handled ex=$ex")
@@ -39,10 +40,15 @@ class ExceptionHandler {
 
     }
 
+    @ExceptionHandler(InvalidTokenException::class)
+    fun handleInvalidTokenException(exception: InvalidTokenException): ResponseEntity<String> {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(exception.message)
+    }
+
 
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(ExceptionHandler::class.java)
     }
-
- */
 }
