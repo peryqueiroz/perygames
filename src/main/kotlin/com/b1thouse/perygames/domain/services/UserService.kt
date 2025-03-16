@@ -1,6 +1,8 @@
 package com.b1thouse.perygames.domain.services
 
+import com.b1thouse.perygames.domain.entities.TransactionRecord
 import com.b1thouse.perygames.domain.entities.UserBet
+import com.b1thouse.perygames.domain.entities.enums.TransactionType
 import com.b1thouse.perygames.domain.exceptions.InvalidAmountException
 import com.b1thouse.perygames.domain.exceptions.NotFoundException
 import com.b1thouse.perygames.domain.gateways.UserStorageGateway
@@ -8,10 +10,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Service
 class UserService(
     private val userStorageGateway: UserStorageGateway,
+    private val transactionRecordService: TransactionRecordService
 ) {
 
     fun getById(userId: String): UserBet {
@@ -28,12 +32,43 @@ class UserService(
                 message = "Error while deposit balance for userId=$userId. Value cant be less than zero"
             )
         }
+        val user = getById(userId)
         try {
-            userStorageGateway.depositBalance(userId, amount)
+            userStorageGateway.depositBalance(user.id, amount)
+            makeTransactionRecord(userId, amount, TransactionType.DEPOSIT, finalBalance = user.balance + amount )
             logger.info("Successfully deposited $amount reais to userId=$userId")
         } catch (ex: Exception) {
             logger.info("Error trying to deposit amount for userId=$userId. ex=${ex.message}" )
         }
+    }
+
+    fun debit(userId: String, amount: BigDecimal, type: TransactionType, description: String? = null, betId: String? = null) {
+        getById(userId).let {
+            val currentAmount = it.balance
+            if (currentAmount >= amount) {
+                val finalBalance = currentAmount.minus(amount)
+                userStorageGateway.update(it.copy(balance = finalBalance))
+                makeTransactionRecord(userId, amount, type, finalBalance, description, betId = betId)
+            }
+        }
+    }
+
+    fun makeTransactionRecord(userId: String,
+                              amount: BigDecimal,
+                              type: TransactionType,
+                              finalBalance: BigDecimal,
+                              description: String? = null,
+                              betId: String? = null) {
+        transactionRecordService.create(TransactionRecord(
+            userId = userId,
+            transactionType = type,
+            betId =  betId,
+            amount = amount,
+            description = description,
+            balanceAfterTransaction = finalBalance,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        ))
     }
 
 /*    fun withdraw(userId: String, request:  ): BigDecimal? {

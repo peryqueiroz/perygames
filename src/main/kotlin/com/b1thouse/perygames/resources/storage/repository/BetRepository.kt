@@ -1,6 +1,7 @@
 package com.b1thouse.perygames.resources.storage.repository
 
 import com.b1thouse.perygames.domain.entities.Bet
+import com.b1thouse.perygames.domain.entities.enums.BetResult
 import com.b1thouse.perygames.domain.entities.enums.BetStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -23,6 +24,7 @@ data class BetTable(
     val status: BetStatus?,
     val amountBet: BigDecimal?,
     val amountReturn: BigDecimal?,
+    val result: BetResult?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ): Persistable<String> {
@@ -42,6 +44,7 @@ data class BetTable(
         amountBet = bet.amountBet,
         amountReturn = bet.amountReturn,
         createdAt = bet.createdAt,
+        result = bet.result,
         updatedAt = if (new) bet.createdAt else LocalDateTime.now()
     ) {
         this.new = new
@@ -54,6 +57,7 @@ data class BetTable(
         status = status,
         amountBet = amountBet,
         amountReturn = amountReturn,
+        result = result,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

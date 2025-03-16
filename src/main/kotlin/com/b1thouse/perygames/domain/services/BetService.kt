@@ -5,6 +5,7 @@ import com.b1thouse.perygames.domain.entities.Bet
 import com.b1thouse.perygames.domain.entities.BetDetail
 import com.b1thouse.perygames.domain.entities.UserBet
 import com.b1thouse.perygames.domain.entities.enums.BetStatus
+import com.b1thouse.perygames.domain.entities.enums.TransactionType
 import com.b1thouse.perygames.domain.entities.enums.UserStatus
 import com.b1thouse.perygames.domain.exceptions.BetAlreadyPendingException
 import com.b1thouse.perygames.domain.exceptions.InsufficientBalanceException
@@ -32,6 +33,7 @@ class BetService(
             betDTO.bet.forEach { betSubtype ->
                 betDetailStorageGateway.create(BetDetail(betId = betSaved.id, betSubtypeId = betSubtype.subtypeId))
             }
+            userService.debit(betDTO.userId, betDTO.amountBet, type = TransactionType.DEBIT_BET, betId = betSaved.id)
         }
 
         betStorageGateway.update(bet.copy(status = BetStatus.PENDING))

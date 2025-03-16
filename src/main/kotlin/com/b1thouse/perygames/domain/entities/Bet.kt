@@ -1,6 +1,7 @@
 package com.b1thouse.perygames.domain.entities
 
 import com.b1thouse.perygames.application.web.dto.BetDTO
+import com.b1thouse.perygames.domain.entities.enums.BetResult
 import com.b1thouse.perygames.domain.entities.enums.BetStatus
 import de.huxhorn.sulky.ulid.ULID
 import java.math.BigDecimal
@@ -13,6 +14,7 @@ data class Bet(
     val status: BetStatus? = BetStatus.CREATED,
     val amountBet: BigDecimal?,
     val amountReturn: BigDecimal?,
+    val result: BetResult? = null,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
