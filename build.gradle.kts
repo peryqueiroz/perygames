@@ -11,7 +11,14 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion.set(JavaLanguageVersion.of(17))
+	}
+}
+
+tasks {
+	bootJar {
+		archiveBaseName.set("perygames")
+		archiveVersion.set("0.0.1-SNAPSHOT")
 	}
 }
 
@@ -28,6 +35,8 @@ dependencies {
 	implementation("org.flywaydb:flyway-database-postgresql")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("com.auth0:java-jwt:4.4.0")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	implementation("redis.clients:jedis")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

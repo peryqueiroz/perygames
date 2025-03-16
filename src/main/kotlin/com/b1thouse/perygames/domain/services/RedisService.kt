@@ -1,0 +1,23 @@
+package com.b1thouse.perygames.domain.services
+
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.stereotype.Service
+import java.util.concurrent.TimeUnit
+
+@Service
+class RedisService(
+    private val redisTemplate: RedisTemplate<String, Any>
+) {
+
+    fun save(key: String, value: Any, ttlInHour: Long) {
+        redisTemplate.opsForValue().set(key, value, ttlInHour, TimeUnit.HOURS)
+    }
+
+    fun save(key: String, value: Any) {
+        redisTemplate.opsForValue().set(key, value)
+    }
+
+    fun getValue(key: String): Any? {
+        return redisTemplate.opsForValue().get(key)
+    }
+}

@@ -1,7 +1,6 @@
 package com.b1thouse.perygames.resources.storage.repository
 
 import com.b1thouse.perygames.domain.entities.UserBet
-import com.b1thouse.perygames.domain.entities.enums.BetStatus
 import com.b1thouse.perygames.domain.entities.enums.UserStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -33,8 +32,6 @@ data class UserTable(
     @Id private val id: String,
     val playerId: String?,
     val status: UserStatus,
-    val email: String?,
-    val password: String?,
     val balance: BigDecimal,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
@@ -51,8 +48,6 @@ data class UserTable(
     id = user.id,
     playerId = user.playerId,
     status = user.status,
-    email = user.email,
-    password = user.password,
     balance = user.balance,
     createdAt = user.createdAt,
     updatedAt = if (new) user.createdAt else LocalDateTime.now()
@@ -64,8 +59,6 @@ data class UserTable(
         id = id,
         playerId = playerId,
         status = status,
-        email = email,
-        password = password,
         balance = balance,
         createdAt = createdAt,
         updatedAt = updatedAt

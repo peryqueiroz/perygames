@@ -1,5 +1,14 @@
-version: '3'
+version: '3.8'
+
 services:
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    networks:
+      - my-network
+
   postgres:
     image: postgres
     container_name: perygames-db
@@ -9,3 +18,45 @@ services:
       POSTGRES_DB: perygames
     ports:
       - 5432:5432
+    networks:
+      - my-network
+
+  app:
+    build: .
+    container_name: perygames-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - my-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://perygames-db:5432/perygames
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_DRIVERCLASSNAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDLAUTO: update
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_TIMEOUT: 5000
+      API_SECURITY_TOKEN_SECRET: my-secret-key
+
+  flyway:
+    image: flyway/flyway:latest
+    container_name: perygames-flyway
+    command: -url=jdbc:postgresql://perygames-db:5432/perygames -user=postgres -password=postgres migrate
+    depends_on:
+      - postgres
+    networks:
+      - my-network
+    environment:
+      FLYWAY_URL: jdbc:postgresql://perygames-db:5432/perygames
+      FLYWAY_USER: postgres
+      FLYWAY_PASSWORD: postgres
+      FLYWAY_LOCATIONS: filesystem:/sql
+
+
+networks:
+  my-network:
+    driver: bridge
