@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class Player(
     val id: String = ULID().nextULID(),
-    val gameId: String?,
+    val gameId: String,
     val name: String,
     val nick: String?,
     val smurf: Boolean? = null,

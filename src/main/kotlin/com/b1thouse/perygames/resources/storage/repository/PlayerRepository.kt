@@ -17,7 +17,7 @@ interface PlayerRepository: CrudRepository<PlayerTable, String> {
 @Table(name = "player")
 data class PlayerTable(
     @Id private val id: String,
-    val gameId: String?,
+    val gameId: String,
     val name: String,
     val nick: String?,
     val smurf: Boolean? = null,

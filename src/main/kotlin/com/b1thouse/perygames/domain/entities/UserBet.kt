@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 data class UserBet(
     val id: String = ULID().nextULID(),
-    val playerId: String?,
+    val playerId: String,
     val status: UserStatus,
     val balance: BigDecimal = BigDecimal.ZERO,
     val createdAt: LocalDateTime,

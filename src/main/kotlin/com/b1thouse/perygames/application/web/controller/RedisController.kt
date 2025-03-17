@@ -19,4 +19,10 @@ class RedisController(private val redisService: RedisService) {
         val value = redisService.getValue(key)
         return value?.toString() ?: "Key not found"
     }
+
+    @GetMapping("/getall")
+    fun getAllKey(): String {
+        val value = redisService.getAllKeys()
+        return value?.toString() ?: "Key not found"
+    }
 }

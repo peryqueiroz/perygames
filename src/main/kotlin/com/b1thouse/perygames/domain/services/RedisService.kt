@@ -20,4 +20,8 @@ class RedisService(
     fun getValue(key: String): Any? {
         return redisTemplate.opsForValue().get(key)
     }
+
+    fun getAllKeys(): Any? {
+        return redisTemplate.keys("*")
+    }
 }

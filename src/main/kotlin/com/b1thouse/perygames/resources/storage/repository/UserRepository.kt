@@ -30,7 +30,7 @@ interface UserRepository: CrudRepository<UserTable, String> {
 @Table(name = "user_bet")
 data class UserTable(
     @Id private val id: String,
-    val playerId: String?,
+    val playerId: String,
     val status: UserStatus,
     val balance: BigDecimal,
     val createdAt: LocalDateTime,
