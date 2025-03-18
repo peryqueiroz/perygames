@@ -1,6 +1,7 @@
 package com.b1thouse.perygames.application.web.controller
 
 import com.b1thouse.perygames.domain.services.RedisService
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -24,5 +25,17 @@ class RedisController(private val redisService: RedisService) {
     fun getAllKey(): String {
         val value = redisService.getAllKeys()
         return value?.toString() ?: "Key not found"
+    }
+
+    @DeleteMapping
+    fun deleteByKey(@RequestParam key: String): String {
+        redisService.deleteKey(key)
+        return "Key deleted"
+    }
+
+    @DeleteMapping("/all")
+    fun deleteAllCache(): String {
+        redisService.clearCache()
+        return "Cache cleared"
     }
 }

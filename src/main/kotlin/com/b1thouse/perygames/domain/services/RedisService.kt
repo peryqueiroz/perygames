@@ -21,7 +21,20 @@ class RedisService(
         return redisTemplate.opsForValue().get(key)
     }
 
-    fun getAllKeys(): Any? {
-        return redisTemplate.keys("*")
+    fun getAllKeys(): List<String>? {
+        return redisTemplate.keys("*").toList()
+    }
+
+    fun deleteKey(key: String): Boolean {
+        return redisTemplate.delete(key)
+    }
+
+    fun clearCache(): Long {
+        val keys = redisTemplate.keys("*")
+        return if (keys.isNotEmpty()) {
+            redisTemplate.delete(keys)
+        } else {
+            0
+        }
     }
 }

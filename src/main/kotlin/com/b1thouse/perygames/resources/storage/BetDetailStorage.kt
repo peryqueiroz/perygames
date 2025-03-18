@@ -13,4 +13,8 @@ class BetDetailStorage(
     override fun create(betDetail: BetDetail): BetDetail {
         return betDetailRepository.save(betDetail.toTable(new = true)).toDomain()
     }
+
+    override fun findByBetId(betId: String): List<BetDetail>? {
+        return betDetailRepository.findByBetId(betId)?.map { it.toDomain() }
+    }
 }

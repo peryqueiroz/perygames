@@ -12,6 +12,11 @@ class PlayerService(
     private val playerStorageGateway: PlayerStorageGateway
 ) {
 
+    fun create(player: Player): Player {
+        logger.info("Created player $player")
+        return playerStorageGateway.create(player)
+    }
+
     fun findById(id: String): Player {
         return playerStorageGateway.getById(id)?.also {
             logger.info("Found player by id=$id")

@@ -23,7 +23,7 @@ class AccountStorage(
     }
 
     override fun getByLogin(login: String?): UserDetails? {
-        logger.info("get by login=$login")
+        //logger.info("get by login=$login")
         return accountRepository.findByLogin(login)
     }
 

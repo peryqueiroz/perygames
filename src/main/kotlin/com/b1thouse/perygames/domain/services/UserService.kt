@@ -1,5 +1,7 @@
 package com.b1thouse.perygames.domain.services
 
+import com.b1thouse.perygames.application.web.dto.CreatePlayerUserDTO
+import com.b1thouse.perygames.domain.entities.Player
 import com.b1thouse.perygames.domain.entities.TransactionRecord
 import com.b1thouse.perygames.domain.entities.UserBet
 import com.b1thouse.perygames.domain.entities.enums.TransactionType
@@ -15,8 +17,14 @@ import java.time.LocalDateTime
 @Service
 class UserService(
     private val userStorageGateway: UserStorageGateway,
-    private val transactionRecordService: TransactionRecordService
+    private val transactionRecordService: TransactionRecordService,
+    private val playerService: PlayerService
 ) {
+    fun create(createPlayerUserDTO: CreatePlayerUserDTO) {
+        playerService.create(Player.fromCreatePlayerUser(createPlayerUserDTO)).let {
+            userStorageGateway.create(UserBet.fromCreatePlayerUser(createPlayerUserDTO, it.id))
+        }
+    }
 
     fun getById(userId: String): UserBet {
         return userStorageGateway.findById(userId)?.also {
@@ -26,7 +34,7 @@ class UserService(
         }
     }
 
-    fun deposit(userId: String, amount: BigDecimal) {
+    fun deposit(userId: String, amount: BigDecimal, transactionType: TransactionType, betId: String? = null) {
         if(amount <= BigDecimal.ZERO) {
             throw InvalidAmountException(
                 message = "Error while deposit balance for userId=$userId. Value cant be less than zero"
@@ -35,7 +43,7 @@ class UserService(
         val user = getById(userId)
         try {
             userStorageGateway.depositBalance(user.id, amount)
-            makeTransactionRecord(userId, amount, TransactionType.DEPOSIT, finalBalance = user.balance + amount )
+            makeTransactionRecord(userId, amount, transactionType, finalBalance = user.balance + amount, betId = betId)
             logger.info("Successfully deposited $amount reais to userId=$userId")
         } catch (ex: Exception) {
             logger.info("Error trying to deposit amount for userId=$userId. ex=${ex.message}" )

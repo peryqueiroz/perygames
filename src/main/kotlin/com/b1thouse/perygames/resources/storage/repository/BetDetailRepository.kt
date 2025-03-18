@@ -9,7 +9,7 @@ import org.springframework.data.repository.CrudRepository
 
 
 interface BetDetailRepository: CrudRepository<BetDetailTable, String> {
-
+    fun findByBetId(betId: String): List<BetDetailTable>?
 }
 
 @Table(name = "bet_detail")
