@@ -11,6 +11,10 @@ import org.springframework.stereotype.Service
 class MatchService(
     private val matchStorageGateway: MatchStorageGateway
 ) {
+    fun create(match: Match): Match {
+        return matchStorageGateway.create(match)
+    }
+
     fun findById(id: String): Match {
         return matchStorageGateway.getById(id)?.also {
             logger.info("Found match by id=$id")

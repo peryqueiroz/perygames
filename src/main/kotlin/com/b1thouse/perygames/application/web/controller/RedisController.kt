@@ -1,5 +1,6 @@
 package com.b1thouse.perygames.application.web.controller
 
+import com.b1thouse.perygames.domain.entities.BetCache
 import com.b1thouse.perygames.domain.services.RedisService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -10,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController
 class RedisController(private val redisService: RedisService) {
 
     @GetMapping("/set")
-    fun setKey(@RequestParam key: String, @RequestParam value: String): String {
-        redisService.save(key, value)
-        return "Key $key saved with value $value"
+    fun setKey(@RequestParam key: String, @RequestParam lastMatchId: String, @RequestParam betId: String): String {
+        val betCache = BetCache(lastMatchId = lastMatchId, betId = betId)
+        redisService.save(key, betCache)
+        return "Key $key saved with value $betCache"
     }
 
     @GetMapping("/get")

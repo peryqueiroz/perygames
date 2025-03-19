@@ -1,24 +1,32 @@
 package com.b1thouse.perygames.domain.services
 
+import com.b1thouse.perygames.domain.entities.BetCache
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
 class RedisService(
-    private val redisTemplate: RedisTemplate<String, Any>
+    private val redisTemplate: RedisTemplate<String, Any>,
+    private val objectMapper: ObjectMapper
 ) {
 
     fun save(key: String, value: Any, ttlInHour: Long) {
-        redisTemplate.opsForValue().set(key, value, ttlInHour, TimeUnit.HOURS)
+        val serializedBetCache = objectMapper.writeValueAsString(value)
+        redisTemplate.opsForValue().set(key, serializedBetCache, ttlInHour, TimeUnit.HOURS)
     }
 
-    fun save(key: String, value: Any) {
-        redisTemplate.opsForValue().set(key, value)
+    fun save(key: String, value: BetCache) {
+        val serializedBetCache = objectMapper.writeValueAsString(value)
+        redisTemplate.opsForValue().set(key, serializedBetCache)
     }
 
-    fun getValue(key: String): Any? {
-        return redisTemplate.opsForValue().get(key)
+    fun getValue(key: String): BetCache? {
+        val serializedBetCache = redisTemplate.opsForValue().get(key) as String?
+        return serializedBetCache?.let {
+            objectMapper.readValue(it, BetCache::class.java)
+        }
     }
 
     fun getAllKeys(): List<String>? {

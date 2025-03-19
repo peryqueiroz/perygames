@@ -41,8 +41,9 @@ class UserService(
             )
         }
         val user = getById(userId)
+        val finalBalance = user.balance.plus(amount)
         try {
-            userStorageGateway.depositBalance(user.id, amount)
+            userStorageGateway.update(user.copy(balance = finalBalance, updatedAt = LocalDateTime.now()))
             makeTransactionRecord(userId, amount, transactionType, finalBalance = user.balance + amount, betId = betId)
             logger.info("Successfully deposited $amount reais to userId=$userId")
         } catch (ex: Exception) {
@@ -55,13 +56,13 @@ class UserService(
             val currentAmount = it.balance
             if (currentAmount >= amount) {
                 val finalBalance = currentAmount.minus(amount)
-                userStorageGateway.update(it.copy(balance = finalBalance))
+                userStorageGateway.update(it.copy(balance = finalBalance, updatedAt = LocalDateTime.now()))
                 makeTransactionRecord(userId, amount, type, finalBalance, description, betId = betId)
             }
         }
     }
 
-    fun makeTransactionRecord(userId: String,
+    private fun makeTransactionRecord(userId: String,
                               amount: BigDecimal,
                               type: TransactionType,
                               finalBalance: BigDecimal,

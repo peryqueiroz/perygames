@@ -23,13 +23,13 @@ data class MatchTable(
     val death: Int?,
     val assist: Int?,
     val award: String?,
-    val imp: String?,
+    val imp: Int?,
     val hero: String?,
     val startDate: LocalDateTime,
     val duration: Int?,
-    val damageTower: String,
-    val damageHero: String,
-    val healing: String,
+    val damageTower: String?,
+    val damageHero: String?,
+    val healing: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ): Persistable<String> {

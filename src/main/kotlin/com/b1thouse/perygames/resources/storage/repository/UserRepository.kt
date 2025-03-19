@@ -17,7 +17,7 @@ interface UserRepository: CrudRepository<UserTable, String> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE user_bet ub set ub.balance = ub.balance + :amount WHERE ub.id = :userId")
+    @Query("UPDATE user_bet set balance = balance + :amount WHERE id = :userId")
     fun depositBalance(userId: String, amount: BigDecimal)
 
     @Modifying

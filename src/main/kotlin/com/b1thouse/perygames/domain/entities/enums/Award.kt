@@ -4,6 +4,11 @@ enum class Award(val value: String, val points: Int) {
     TOP_CORE("TOP_CORE",5),
     TOP_SUPPORT("TOP_SUPPORT",5),
     MVP("MVP",5),
-    TOP_MVP("TOP_MVP",10)
+    TOP_MVP("TOP_MVP",10);
 
+    companion object {
+        fun fromString(value: String?): Award? {
+            return entries.find { it.value == value }
+        }
+    }
 }

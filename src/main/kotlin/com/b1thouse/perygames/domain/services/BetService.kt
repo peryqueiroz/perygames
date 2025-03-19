@@ -1,21 +1,20 @@
 package com.b1thouse.perygames.domain.services
 
 import com.b1thouse.perygames.application.web.dto.BetDTO
-import com.b1thouse.perygames.domain.entities.Bet
-import com.b1thouse.perygames.domain.entities.BetCache
-import com.b1thouse.perygames.domain.entities.BetDetail
-import com.b1thouse.perygames.domain.entities.UserBet
+import com.b1thouse.perygames.domain.entities.*
 import com.b1thouse.perygames.domain.entities.enums.BetResult
 import com.b1thouse.perygames.domain.entities.enums.BetStatus
 import com.b1thouse.perygames.domain.entities.enums.TransactionType
 import com.b1thouse.perygames.domain.entities.enums.UserStatus
-import com.b1thouse.perygames.domain.entities.external.LastMatch
+import com.b1thouse.perygames.domain.entities.external.LastMatchResponse
+import com.b1thouse.perygames.domain.entities.external.MatchInfoResponse
 import com.b1thouse.perygames.domain.exceptions.BetAlreadyPendingException
 import com.b1thouse.perygames.domain.exceptions.InsufficientBalanceException
 import com.b1thouse.perygames.domain.exceptions.UserNotActiveException
 import com.b1thouse.perygames.domain.gateways.BetDetailStorageGateway
 import com.b1thouse.perygames.domain.gateways.BetStorageGateway
 import com.b1thouse.perygames.domain.services.external.StratzService
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -29,7 +28,8 @@ class BetService(
     private val redisService: RedisService,
     private val stratzService: StratzService,
     private val playerService: PlayerService,
-    private val matchService: MatchService
+    private val matchService: MatchService,
+    private val objectMapper: ObjectMapper
 ) {
     fun create(betDTO: BetDTO) {
         val user = userService.getById(betDTO.userId)
@@ -59,15 +59,15 @@ class BetService(
             val steamIdsBetFormated = steamIdsBet.joinToString(",")
             val responseApi = stratzService.executeQuery(
                     "{players(steamAccountIds:[$steamIdsBetFormated]){steamAccountId matches(request:{take:1}){id}}}",
-                LastMatch::class.java
+                LastMatchResponse::class.java
             )
             responseApi?.data?.players?.forEach {
-                val betCache: BetCache = redisService.getValue(it.steamAccountId!!) as BetCache
+                val betCache = redisService.getValue(it.steamAccountId!!)
                 val lastMatchFromApi = it.matches.first().id.toString()
-                if (lastMatchFromApi != betCache.lastMatchId) {
+                if (lastMatchFromApi != betCache?.lastMatchId) {
                     logger.info("New match has found to bet pending steamId=${it.steamAccountId} match=$lastMatchFromApi")
-                    completeBet(betCache.betId, lastMatchFromApi, it.steamAccountId)
                     redisService.deleteKey(it.steamAccountId)
+                    completeBet(betCache?.betId!!, lastMatchFromApi, it.steamAccountId)
                 } else {
                     logger.info("Same match for steamId ${it.steamAccountId}")
                 }
@@ -78,26 +78,33 @@ class BetService(
     fun completeBet(betId: String, matchGameId: String, steamAccountId: String) {
         logger.info("Completing betId = $betId with matchGameId = $matchGameId")
         val bet = betStorageGateway.findById(betId)
-        val match = matchService.findByGameId(matchGameId)
-        if(bet!!.createdAt.isBefore(match?.startDate)) {
+        val query = "{match(id:$matchGameId){startDateTime, durationSeconds, players(steamAccountId:$steamAccountId) {steamAccountId, kills, deaths, assists, imp, heroDamage, towerDamage, heroHealing, isVictory, award, hero{displayName}}}}"
+        val user = userService.getById(bet?.userId!!)
+        val matchStratz = stratzService.executeQuery(query, MatchInfoResponse::class.java)
+        if(matchStratz == null) {
+            logger.info("Match info is null from Stratz api response. betId=$betId matchGameId=$matchGameId user=${user.id}")
+            // retentar?
+        }
+        val match: Match = Match.fromMatchInfoResponse(matchStratz!!, user.playerId)
+        matchService.create(match)
+        if(bet.createdAt.isBefore(match.startDate)) {
             val betDetail = betDetailStorageGateway.findByBetId(betId)
-
-            val killAssist = match?.kill?.plus(match.assist!!)
-            var deaths = match?.death
+            val killAssist = match.kill?.plus(match.assist!!)
+            var deaths = match.death
             if(deaths == 0) deaths += 1
             val playerKda = BigDecimal.valueOf(Math.floorDiv(killAssist!!, deaths!!).toLong())
             // && (playerKda > betDetail.first().)
             if (match.win) {
                 logger.info("Bet $betId won. AmountWon=${bet.amountReturn}")
-                betStorageGateway.update(bet.copy(status = BetStatus.FINISH, matchId = matchGameId, result = BetResult.WIN))
-                userService.deposit(userId = bet.userId!!, amount = bet.amountReturn!!, transactionType = TransactionType.DEBIT_BET, betId = betId)
+                betStorageGateway.update(bet.copy(status = BetStatus.FINISH, matchId = match.id, result = BetResult.WIN))
+                userService.deposit(userId = bet.userId, amount = bet.amountReturn!!, transactionType = TransactionType.DEBIT_BET, betId = betId)
             } else {
                 logger.info("Bet $betId lost.")
                 betStorageGateway.update(bet.copy(status = BetStatus.FINISH, matchId = matchGameId, result = BetResult.LOSE))
             }
         } else {
             logger.info("Bet was created after game start. betId=$betId matchSteamId=$matchGameId")
-            val betCache = BetCache(lastMatchId = matchGameId, betId = betId)
+            val betCache = BetCache(lastMatchId = match.gameId, betId = betId)
             redisService.save(steamAccountId, betCache)
             logger.info("New cache saved key=$steamAccountId value=$betCache")
         }
@@ -118,7 +125,7 @@ class BetService(
         val player = playerService.findById(user.playerId)
         val query = "{ player(steamAccountId: ${player.gameId}) { matches(request:  { take: 1 }) { id } } }"
 
-         val responseApi = stratzService.executeQuery(query, LastMatch::class.java)
+         val responseApi = stratzService.executeQuery(query, LastMatchResponse::class.java)
         // val responseApi = LastMatch(Data(player = listOf(Player(matches = listOf(Match(id=112233))))))
 
         val lastMatchId = responseApi?.data?.player?.matches?.first()?.id.toString()
