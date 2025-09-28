@@ -6,10 +6,12 @@ import com.b1thouse.perygames.domain.entities.enums.BetResult
 import com.b1thouse.perygames.domain.entities.enums.BetStatus
 import com.b1thouse.perygames.domain.entities.enums.TransactionType
 import com.b1thouse.perygames.domain.entities.enums.UserStatus
+import com.b1thouse.perygames.domain.entities.external.AnonymousResponse
 import com.b1thouse.perygames.domain.entities.external.LastMatchResponse
 import com.b1thouse.perygames.domain.entities.external.MatchInfoResponse
 import com.b1thouse.perygames.domain.exceptions.BetAlreadyPendingException
 import com.b1thouse.perygames.domain.exceptions.InsufficientBalanceException
+import com.b1thouse.perygames.domain.exceptions.PrivateProfileException
 import com.b1thouse.perygames.domain.exceptions.UserNotActiveException
 import com.b1thouse.perygames.domain.gateways.BetDetailStorageGateway
 import com.b1thouse.perygames.domain.gateways.BetStorageGateway
@@ -29,12 +31,12 @@ class BetService(
     private val stratzService: StratzService,
     private val playerService: PlayerService,
     private val matchService: MatchService,
-    private val objectMapper: ObjectMapper
 ) {
     fun create(betDTO: BetDTO) {
         val user = userService.getById(betDTO.userId)
 
         if(!isUserActive(user)) throw UserNotActiveException()
+        if(isPlayerAccountPrivate(user)) throw PrivateProfileException()
         if(!isBalanceValidForBet(user, betDTO)) throw InsufficientBalanceException()
         if(hasPendingBet(betDTO.userId)) throw BetAlreadyPendingException()
 
@@ -58,18 +60,22 @@ class BetService(
             logger.info("Bet pending found on cache steamIds=$steamIdsBet")
             val steamIdsBetFormated = steamIdsBet.joinToString(",")
             val responseApi = stratzService.executeQuery(
-                    "{players(steamAccountIds:[$steamIdsBetFormated]){steamAccountId matches(request:{take:1}){id}}}",
+                    "{players(steamAccountIds:[$steamIdsBetFormated]){steamAccount{isAnonymous} steamAccountId matches(request:{take:1}){id}}}",
                 LastMatchResponse::class.java
             )
             responseApi?.data?.players?.forEach {
-                val betCache = redisService.getValue(it.steamAccountId!!)
-                val lastMatchFromApi = it.matches.first().id.toString()
-                if (lastMatchFromApi != betCache?.lastMatchId) {
-                    logger.info("New match has found to bet pending steamId=${it.steamAccountId} match=$lastMatchFromApi")
-                    redisService.deleteKey(it.steamAccountId)
-                    completeBet(betCache?.betId!!, lastMatchFromApi, it.steamAccountId)
+                if(!it.steamAccount?.isAnonymous.toBoolean()) {
+                    val betCache = redisService.getValue(it.steamAccountId!!)
+                    val lastMatchFromApi = it.matches.first().id.toString()
+                    if (lastMatchFromApi != betCache?.lastMatchId) {
+                        logger.info("New match has found to bet pending steamId=${it.steamAccountId} match=$lastMatchFromApi")
+                        redisService.deleteKey(it.steamAccountId)
+                        completeBet(betCache?.betId!!, lastMatchFromApi, it.steamAccountId)
+                    } else {
+                        logger.info("Same match for steamId ${it.steamAccountId}")
+                    }
                 } else {
-                    logger.info("Same match for steamId ${it.steamAccountId}")
+                    // funcao pra fazer quando o perfil é privado
                 }
             }
         }
@@ -109,15 +115,15 @@ class BetService(
             logger.info("New cache saved key=$steamAccountId value=$betCache")
         }
     }
-    fun hasPendingBet(userId: String): Boolean {
+    private fun hasPendingBet(userId: String): Boolean {
         return betStorageGateway.findByUserIdAndStatusIn(userId, BetStatus.getPendingStatus()).isNotEmpty()
     }
 
-    fun isBalanceValidForBet(user: UserBet, betDTO: BetDTO): Boolean {
+    private fun isBalanceValidForBet(user: UserBet, betDTO: BetDTO): Boolean {
         return user.balance >= betDTO.amountBet
     }
 
-    fun isUserActive(user: UserBet): Boolean {
+    private fun isUserActive(user: UserBet): Boolean {
         return user.status == UserStatus.ACTIVE
     }
 
@@ -135,6 +141,13 @@ class BetService(
             redisService.save(player.gameId, BetCache(lastMatchId = lastMatchId, betId = betId))
             logger.info("Saving on cache key: ${player.gameId} value: $lastMatchId")
         }
+    }
+
+    fun isPlayerAccountPrivate(user: UserBet): Boolean {
+        val player = playerService.findById(user.playerId)
+        val response = stratzService.executeQuery("{player(steamAccountId:${player.gameId}){steamAccount {isAnonymous}}}", AnonymousResponse::class.java)
+        val isAnonymous = response?.data?.player?.steamAccountId?.isAnonymous.toBoolean()
+        return isAnonymous
     }
 
     companion object {

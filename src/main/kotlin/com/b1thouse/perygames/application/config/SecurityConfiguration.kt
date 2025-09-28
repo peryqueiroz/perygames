@@ -51,15 +51,4 @@ class SecurityConfiguration(
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
-
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.addAllowedOrigin("*")  // Permitir qualquer origem, ajuste conforme necessário
-        configuration.addAllowedMethod("*")  // Permitir qualquer método HTTP
-        configuration.addAllowedHeader("*")  // Permitir qualquer cabeçalho
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
-    }
 }

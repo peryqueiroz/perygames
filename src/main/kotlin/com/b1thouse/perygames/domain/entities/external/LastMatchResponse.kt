@@ -14,7 +14,12 @@ data class LastMatchData(
 
 data class LastMatchPlayer(
     @JsonProperty("steamAccountId") val steamAccountId: String? = null,
+    @JsonProperty("steamAccount") val steamAccount: LastMatchSteamAccount? = null,
     @JsonProperty("matches") val matches: List<LastMatch>
+)
+
+data class LastMatchSteamAccount(
+    @JsonProperty("isAnonymous") val isAnonymous: String
 )
 
 data class LastMatch(

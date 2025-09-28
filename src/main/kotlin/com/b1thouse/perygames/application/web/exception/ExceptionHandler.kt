@@ -1,4 +1,4 @@
-package com.b1thouse.perygames.application.web.exception
+/*package com.b1thouse.perygames.application.web.exception
 
 import com.b1thouse.perygames.domain.exceptions.BaseException
 import com.b1thouse.perygames.domain.exceptions.ErrorResponse
@@ -52,3 +52,5 @@ class ExceptionHandler {
         private val logger: Logger = LoggerFactory.getLogger(ExceptionHandler::class.java)
     }
 }
+
+ */

@@ -11,5 +11,6 @@ enum class TypeError(val message: String) {
     ALREADY_BET_PENDING("User already has bet on going"),
     INVALID_TOKEN("Invalid Token"),
     INSUFFICIENT_BALANCE("Balance has insufficient amount"),
-    USER_NOT_ACTIVE("User not active")
+    USER_NOT_ACTIVE("User not active"),
+    PRIVATE_PROFILE("Player has profile private")
 }
