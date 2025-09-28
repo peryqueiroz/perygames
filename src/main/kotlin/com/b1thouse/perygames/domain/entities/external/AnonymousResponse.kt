@@ -12,7 +12,7 @@ data class AnonymousData(
 )
 
 data class AnonymousPlayer(
-    @JsonProperty("steamAccountId") val steamAccountId: AnonymousSteamAccount
+    @JsonProperty("steamAccount") val steamAccount: AnonymousSteamAccount
 )
 
 data class AnonymousSteamAccount(

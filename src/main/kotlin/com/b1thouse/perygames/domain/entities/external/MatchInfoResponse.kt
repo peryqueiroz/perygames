@@ -18,7 +18,7 @@ data class MatchInfo(
 
 
 data class PlayersMatchInfo(
-    @JsonProperty("steamAccountId") val steamAccountId: String,
+    @JsonProperty("matchId") val matchId: String,
     @JsonProperty("kills") val kills: String?,
     @JsonProperty("deaths") val deaths: String?,
     @JsonProperty("assists") val assists: String?,

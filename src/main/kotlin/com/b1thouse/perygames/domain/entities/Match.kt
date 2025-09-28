@@ -30,7 +30,7 @@ data class Match(
         fun fromMatchInfoResponse(matchInfoResponse: MatchInfoResponse, playerId: String): Match {
             val matchInfo = matchInfoResponse.data.match.players.first()
             return Match(
-                gameId = matchInfo.steamAccountId,
+                gameId = matchInfo.matchId,
                 playerId = playerId,
                 win = matchInfo.isVictory.toBoolean(),
                 kill = matchInfo.kills?.toInt(),

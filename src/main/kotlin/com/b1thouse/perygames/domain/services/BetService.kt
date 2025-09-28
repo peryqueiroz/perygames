@@ -16,7 +16,6 @@ import com.b1thouse.perygames.domain.exceptions.UserNotActiveException
 import com.b1thouse.perygames.domain.gateways.BetDetailStorageGateway
 import com.b1thouse.perygames.domain.gateways.BetStorageGateway
 import com.b1thouse.perygames.domain.services.external.StratzService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -75,7 +74,7 @@ class BetService(
                         logger.info("Same match for steamId ${it.steamAccountId}")
                     }
                 } else {
-                    // funcao pra fazer quando o perfil é privado
+                    // ToDo: funcao pra fazer quando o perfil é privado
                 }
             }
         }
@@ -84,7 +83,7 @@ class BetService(
     fun completeBet(betId: String, matchGameId: String, steamAccountId: String) {
         logger.info("Completing betId = $betId with matchGameId = $matchGameId")
         val bet = betStorageGateway.findById(betId)
-        val query = "{match(id:$matchGameId){startDateTime, durationSeconds, players(steamAccountId:$steamAccountId) {steamAccountId, kills, deaths, assists, imp, heroDamage, towerDamage, heroHealing, isVictory, award, hero{displayName}}}}"
+        val query = "{match(id:$matchGameId){startDateTime, durationSeconds, players(steamAccountId:$steamAccountId) {matchId, kills, deaths, assists, imp, heroDamage, towerDamage, heroHealing, isVictory, award, hero{displayName}}}}"
         val user = userService.getById(bet?.userId!!)
         val matchStratz = stratzService.executeQuery(query, MatchInfoResponse::class.java)
         if(matchStratz == null) {
@@ -92,8 +91,8 @@ class BetService(
             // retentar?
         }
         val match: Match = Match.fromMatchInfoResponse(matchStratz!!, user.playerId)
-        matchService.create(match)
         if(bet.createdAt.isBefore(match.startDate)) {
+            val matchCreated = matchService.create(match)
             val betDetail = betDetailStorageGateway.findByBetId(betId)
             val killAssist = match.kill?.plus(match.assist!!)
             var deaths = match.death
@@ -103,10 +102,10 @@ class BetService(
             if (match.win) {
                 logger.info("Bet $betId won. AmountWon=${bet.amountReturn}")
                 betStorageGateway.update(bet.copy(status = BetStatus.FINISH, matchId = match.id, result = BetResult.WIN))
-                userService.deposit(userId = bet.userId, amount = bet.amountReturn!!, transactionType = TransactionType.DEBIT_BET, betId = betId)
+                userService.deposit(userId = bet.userId, amount = bet.amountReturn!!, transactionType = TransactionType.CREDIT_BET, betId = betId)
             } else {
                 logger.info("Bet $betId lost.")
-                betStorageGateway.update(bet.copy(status = BetStatus.FINISH, matchId = matchGameId, result = BetResult.LOSE))
+                betStorageGateway.update(bet.copy(status = BetStatus.FINISH, matchId = matchCreated.id, result = BetResult.LOSE))
             }
         } else {
             logger.info("Bet was created after game start. betId=$betId matchSteamId=$matchGameId")
@@ -137,6 +136,7 @@ class BetService(
         val lastMatchId = responseApi?.data?.player?.matches?.first()?.id.toString()
         if (lastMatchId.isEmpty()) {
             println("Last match of user=${user.id} is null")
+            //ToDo: return Exception?
         } else {
             redisService.save(player.gameId, BetCache(lastMatchId = lastMatchId, betId = betId))
             logger.info("Saving on cache key: ${player.gameId} value: $lastMatchId")
@@ -146,7 +146,7 @@ class BetService(
     fun isPlayerAccountPrivate(user: UserBet): Boolean {
         val player = playerService.findById(user.playerId)
         val response = stratzService.executeQuery("{player(steamAccountId:${player.gameId}){steamAccount {isAnonymous}}}", AnonymousResponse::class.java)
-        val isAnonymous = response?.data?.player?.steamAccountId?.isAnonymous.toBoolean()
+        val isAnonymous = response?.data?.player?.steamAccount?.isAnonymous.toBoolean()
         return isAnonymous
     }
 
