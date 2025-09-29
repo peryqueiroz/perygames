@@ -1,13 +1,31 @@
-FROM openjdk:17-jdk-slim-buster
-
+# Build stage
+FROM eclipse-temurin:17-jdk-alpine as builder
 WORKDIR /app
 
-COPY build/libs/* build/lib/
+# Copy files
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY src src
 
-COPY build/libs/perygames*.jar build/
+# Build application
+RUN ./gradlew clean bootJar -x test
 
-WORKDIR /app/build
+# Runtime stage
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Copy jar from build stage
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 EXPOSE 8080
-
-ENTRYPOINT java -jar perygames-0.0.1-SNAPSHOT.jar
+ENTRYPOINT ["java", "-jar", "/app.jar"]
