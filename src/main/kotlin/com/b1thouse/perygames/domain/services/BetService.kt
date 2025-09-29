@@ -74,7 +74,11 @@ class BetService(
                         logger.info("Same match for steamId ${it.steamAccountId}")
                     }
                 } else {
-                    // ToDo: funcao pra fazer quando o perfil é privado
+                    logger.info("Player ${it.steamAccountId} has blocked profile")
+                    redisService.getValue(it.steamAccountId!!)?.let { betCache ->
+                        cancelBet(betCache.betId)
+                    } ?: logger.info("betId not found on redis. steamAccountId=${it.steamAccountId}")
+                    throw PrivateProfileException()
                 }
             }
         }
@@ -88,7 +92,7 @@ class BetService(
         val matchStratz = stratzService.executeQuery(query, MatchInfoResponse::class.java)
         if(matchStratz == null) {
             logger.info("Match info is null from Stratz api response. betId=$betId matchGameId=$matchGameId user=${user.id}")
-            // retentar?
+            // ToDo: retentar?
         }
         val match: Match = Match.fromMatchInfoResponse(matchStratz!!, user.playerId)
         if(bet.createdAt.isBefore(match.startDate)) {
@@ -140,6 +144,15 @@ class BetService(
         } else {
             redisService.save(player.gameId, BetCache(lastMatchId = lastMatchId, betId = betId))
             logger.info("Saving on cache key: ${player.gameId} value: $lastMatchId")
+        }
+    }
+
+    fun cancelBet(betId: String?) {
+        betId?.let {
+            betStorageGateway.findById(it)?.let { bet ->
+                betStorageGateway.update(bet.copy(status = BetStatus.CANCELED))
+                logger.info("Bet $betId changed to CANCELED")
+            } ?: logger.info("Bet $betId can not be canceled!")
         }
     }
 
