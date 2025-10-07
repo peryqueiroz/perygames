@@ -13,10 +13,10 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 @Service
-class TokenService {
+class TokenService(
     @Value("\${api.security.token.secret}")
-    private lateinit var secret: String
-
+    private val secret: String
+) {
     init {
         println("🔐 TokenService initialized with secret: ${secret.take(4)}****")
     }
