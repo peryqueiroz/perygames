@@ -21,16 +21,29 @@ class SecurityFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = this.recoverToken(request)
-        if (token != null) {
-            val login = tokenService.validateToken(token)
-            val user = accountStorageGateway.getByLogin(login)
+        try {
+            val token = this.recoverToken(request)
+            if (token != null) {
+                val login = tokenService.validateToken(token)
+                val user = accountStorageGateway.getByLogin(login)
 
-            val authentication = UsernamePasswordAuthenticationToken(user, null, user?.authorities)
-            SecurityContextHolder.getContext().authentication = authentication
+                if (user != null) {
+                    val authentication = UsernamePasswordAuthenticationToken(user, null, user.authorities)
+                    SecurityContextHolder.getContext().authentication = authentication
+                    println("✅ User authenticated: $login")
+                } else {
+                    println("❌ User not found for login: $login")
+                }
+            } else {
+                println("ℹ️ No token found in request")
+            }
+        } catch (ex: Exception) {
+            println("❌ Exception during authentication: ${ex.message}")
         }
+
         filterChain.doFilter(request, response)
     }
+
 
     private fun recoverToken(request: HttpServletRequest): String? {
         val authHeader = request.getHeader("Authorization") ?: return null
