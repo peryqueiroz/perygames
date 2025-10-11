@@ -28,7 +28,9 @@ class SecurityConfig(
     fun securityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
         return httpSecurity
             .cors { }
-            .csrf { csrf -> csrf.disable() }
+            .formLogin { login -> login.disable() } // <- Desativa formulário
+            .httpBasic {http -> http.disable()}
+            .csrf( { csrf -> csrf.disable() })
             .sessionManagement { session -> session.sessionCreationPolicy(
                 SessionCreationPolicy.STATELESS
             )
