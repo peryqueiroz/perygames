@@ -62,7 +62,7 @@ class SecurityConfig(
             allowedOrigins = listOf("*")
             allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
-            allowCredentials = true
+            allowCredentials = false
         }
 
         val source = UrlBasedCorsConfigurationSource()

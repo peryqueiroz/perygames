@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,10 +24,11 @@ class AuthenticationController(
     @Autowired
     private val authenticationManager: AuthenticationManager,
     private val authStorageGateway: AccountStorageGateway,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
+    private val passwordEncoder: PasswordEncoder
 ) {
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     fun login(@RequestBody data: AuthenticationDTO): ResponseEntity<LoginResponse> {
         val credentials = UsernamePasswordAuthenticationToken(data.login, data.password)
         val auth = authenticationManager.authenticate(credentials)
@@ -39,11 +39,13 @@ class AuthenticationController(
 
     @PostMapping("/register")
     fun register(@RequestBody registerDTO: RegisterDTO): ResponseEntity<String> {
+        logger.info("📝 Register attempt for user: ${registerDTO.login}")
+
         val auth = authStorageGateway.getByLogin(registerDTO.login)
         if(authStorageGateway.getByLogin(registerDTO.login) != null) return ResponseEntity.badRequest().build()
 
         logger.info("auth $auth")
-        val encryptedPassword = BCryptPasswordEncoder().encode(registerDTO.password)
+        val encryptedPassword = passwordEncoder.encode(registerDTO.password)
         val newUser = AuthUser(registerDTO.login, encryptedPassword, registerDTO.role)
 
         authStorageGateway.create(newUser)
