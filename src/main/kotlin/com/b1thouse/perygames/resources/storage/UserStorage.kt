@@ -24,6 +24,10 @@ class UserStorage(
         return userRepository.findByIdOrNull(id)?.toDomain()
     }
 
+    override fun findByAccountId(accountId: String): UserBet? {
+        return userRepository.findByAccountId(accountId)?.toDomain()
+    }
+
     override fun depositBalance(userId: String, amount: BigDecimal) {
         return userRepository.depositBalance(userId, amount)
     }

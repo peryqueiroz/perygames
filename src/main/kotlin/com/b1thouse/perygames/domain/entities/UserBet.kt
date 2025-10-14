@@ -11,6 +11,7 @@ data class UserBet(
     val playerId: String,
     val status: UserStatus,
     val balance: BigDecimal = BigDecimal.ZERO,
+    val accountId: String? = null,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
@@ -20,7 +21,8 @@ data class UserBet(
                 playerId = playerId,
                 status = createPlayerUserDTO.status,
                 createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
+                updatedAt = LocalDateTime.now(),
+                accountId = createPlayerUserDTO.accountId
             )
         }
     }

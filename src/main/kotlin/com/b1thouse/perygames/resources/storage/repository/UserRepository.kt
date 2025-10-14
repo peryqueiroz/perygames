@@ -24,6 +24,8 @@ interface UserRepository: CrudRepository<UserTable, String> {
     @Transactional
     @Query("UPDATE user_bet ub set ub.balance = ub.balance - :amount WHERE ub.id = :userId")
     fun withdrawBalance(userId: String, amount: BigDecimal)
+
+    fun findByAccountId(accountId: String): UserTable?
 }
 
 
@@ -33,6 +35,7 @@ data class UserTable(
     val playerId: String,
     val status: UserStatus,
     val balance: BigDecimal,
+    val accountId: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ): Persistable<String> {
@@ -49,6 +52,7 @@ data class UserTable(
     playerId = user.playerId,
     status = user.status,
     balance = user.balance,
+    accountId = user.accountId,
     createdAt = user.createdAt,
     updatedAt = if (new) user.createdAt else LocalDateTime.now()
     ) {
@@ -60,6 +64,7 @@ data class UserTable(
         playerId = playerId,
         status = status,
         balance = balance,
+        accountId = accountId,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

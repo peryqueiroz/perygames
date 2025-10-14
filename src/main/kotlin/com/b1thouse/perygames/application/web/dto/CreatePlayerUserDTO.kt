@@ -10,5 +10,6 @@ data class CreatePlayerUserDTO(
     val ranking: Int? = null,
     val medal: String? = null,
     val avatar: String? = null,
-    val status: UserStatus = UserStatus.ACTIVE
+    val status: UserStatus = UserStatus.ACTIVE,
+    val accountId: String? = null
 )

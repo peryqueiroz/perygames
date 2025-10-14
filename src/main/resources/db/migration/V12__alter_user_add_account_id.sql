@@ -1,0 +1,2 @@
+ALTER TABLE user_bet
+ADD COLUMN account_id VARCHAR(26);

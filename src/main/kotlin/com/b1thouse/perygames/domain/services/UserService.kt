@@ -62,6 +62,11 @@ class UserService(
         }
     }
 
+    fun getByAccountId(accountId: String): UserBet? {
+        logger.info("Finding user by accountId=$accountId")
+        return userStorageGateway.findByAccountId(accountId)
+    }
+
     private fun makeTransactionRecord(userId: String,
                               amount: BigDecimal,
                               type: TransactionType,

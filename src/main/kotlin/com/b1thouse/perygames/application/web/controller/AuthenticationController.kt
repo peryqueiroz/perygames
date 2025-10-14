@@ -6,6 +6,7 @@ import com.b1thouse.perygames.application.web.dto.LoginResponse
 import com.b1thouse.perygames.application.web.dto.RegisterDTO
 import com.b1thouse.perygames.domain.entities.AuthUser
 import com.b1thouse.perygames.domain.gateways.AccountStorageGateway
+import com.b1thouse.perygames.domain.services.UserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,16 +26,22 @@ class AuthenticationController(
     private val authenticationManager: AuthenticationManager,
     private val authStorageGateway: AccountStorageGateway,
     private val tokenService: TokenService,
-    private val passwordEncoder: PasswordEncoder
+    private val passwordEncoder: PasswordEncoder,
+    private val userService: UserService
 ) {
 
     @PostMapping("/login")
     fun login(@RequestBody data: AuthenticationDTO): ResponseEntity<LoginResponse> {
         val credentials = UsernamePasswordAuthenticationToken(data.login, data.password)
         val auth = authenticationManager.authenticate(credentials)
-        val token = tokenService.generateToken(auth.principal as AuthUser)
-
-        return ResponseEntity.ok(LoginResponse(token))
+        val authUser = auth.principal as AuthUser
+        val loginResponse = tokenService.generateToken(authUser)
+        authUser.id?.let {
+            logger.info("Found auth ID=$it")
+            val user = userService.getByAccountId(it)
+            loginResponse.copy(userId = user?.id)
+        }
+        return ResponseEntity.ok(loginResponse)
     }
 
     @PostMapping("/register")
