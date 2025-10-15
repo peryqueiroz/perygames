@@ -40,7 +40,7 @@ class AuthenticationController(
             logger.info("Found auth ID=$it")
             val user = userService.getByAccountId(it)
             logger.info("userId=${user?.id}")
-            loginResponse.copy(userId = user?.id)
+            return ResponseEntity.ok(loginResponse.copy(userId = user?.id))
         }
         return ResponseEntity.ok(loginResponse)
     }
