@@ -1,5 +1,6 @@
 package com.b1thouse.perygames.application.web.controller
 
+import com.b1thouse.perygames.application.web.dto.BalanceResponse
 import com.b1thouse.perygames.application.web.dto.CreatePlayerUserDTO
 import com.b1thouse.perygames.domain.entities.enums.TransactionType
 import com.b1thouse.perygames.domain.services.UserService
@@ -33,8 +34,8 @@ class UserController(
     }
 
     @GetMapping("/{userId}/balance")
-    fun getBalanceById(@PathVariable("userId") userId: String) : ResponseEntity<BigDecimal> {
-        return ResponseEntity.ok(userService.getById(userId).balance)
+    fun getBalanceById(@PathVariable("userId") userId: String) : ResponseEntity<BalanceResponse> {
+        return ResponseEntity.ok(BalanceResponse(userService.getById(userId).balance))
     }
 
 /*    @PostMapping("/{userId}/withdraw")
