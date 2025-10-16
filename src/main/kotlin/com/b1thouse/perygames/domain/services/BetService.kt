@@ -118,7 +118,7 @@ class BetService(
             logger.info("New cache saved key=$steamAccountId value=$betCache")
         }
     }
-    private fun hasPendingBet(userId: String): Boolean {
+    fun hasPendingBet(userId: String): Boolean {
         return betStorageGateway.findByUserIdAndStatusIn(userId, BetStatus.getPendingStatus()).isNotEmpty()
     }
 

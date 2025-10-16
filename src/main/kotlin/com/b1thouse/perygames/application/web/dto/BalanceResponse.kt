@@ -5,5 +5,4 @@ import java.math.BigDecimal
 
 data class BalanceResponse(
     @JsonProperty("balance", required = true) val balance: BigDecimal,
-) {
-}
+)
