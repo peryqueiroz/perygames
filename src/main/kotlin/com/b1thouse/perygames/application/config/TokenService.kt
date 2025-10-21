@@ -18,9 +18,6 @@ class TokenService(
     @Value("\${api.security.token.secret}")
     private val secret: String
 ) {
-    init {
-        println("🔐 TokenService initialized with secret: ${secret.take(4)}****")
-    }
 
     fun generateToken(user: AuthUser): LoginResponse {
         return try {

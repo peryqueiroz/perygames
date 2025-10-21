@@ -1,6 +1,8 @@
 package com.b1thouse.perygames.domain.services
 
 import com.b1thouse.perygames.application.web.dto.BetDTO
+import com.b1thouse.perygames.application.web.dto.CurrentBet
+import com.b1thouse.perygames.application.web.dto.UserBetStatus
 import com.b1thouse.perygames.domain.entities.*
 import com.b1thouse.perygames.domain.entities.enums.BetResult
 import com.b1thouse.perygames.domain.entities.enums.BetStatus
@@ -37,7 +39,7 @@ class BetService(
         if(!isUserActive(user)) throw UserNotActiveException()
         if(isPlayerAccountPrivate(user)) throw PrivateProfileException()
         if(!isBalanceValidForBet(user, betDTO)) throw InsufficientBalanceException()
-        if(hasPendingBet(betDTO.userId)) throw BetAlreadyPendingException()
+        if(hasPendingBet(betDTO.userId).hasBetPending) throw BetAlreadyPendingException()
 
         val bet = Bet.fromDTO(betDTO)
 
@@ -118,8 +120,17 @@ class BetService(
             logger.info("New cache saved key=$steamAccountId value=$betCache")
         }
     }
-    fun hasPendingBet(userId: String): Boolean {
-        return betStorageGateway.findByUserIdAndStatusIn(userId, BetStatus.getPendingStatus()).isNotEmpty()
+    fun hasPendingBet(userId: String): UserBetStatus {
+        betStorageGateway.findByUserIdAndStatusIn(userId, BetStatus.getPendingStatus()).let {
+            logger.info("Bet ${it.size} found for user=$userId . Bet id=${it.first().id}")
+            return UserBetStatus(hasBetPending = it.isNotEmpty(), currentBet = CurrentBet(
+                matchId = it.first().id,
+                amount = it.first().amountBet!!,
+                amountReturn = it.first().amountReturn!!,
+                odd = it.first().amountReturn!!.divide(it.first().amountBet!!),
+                createdAt = it.first().createdAt)
+            )
+        }
     }
 
     private fun isBalanceValidForBet(user: UserBet, betDTO: BetDTO): Boolean {

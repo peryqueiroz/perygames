@@ -18,6 +18,6 @@ class BetController(
 
     @GetMapping("/user/{userId}/bet-status")
     fun betStatus(@PathVariable("userId") userId: String) : ResponseEntity<UserBetStatus> {
-        return ResponseEntity.ok(UserBetStatus(betService.hasPendingBet(userId)))
+        return ResponseEntity.ok(betService.hasPendingBet(userId))
     }
 }
