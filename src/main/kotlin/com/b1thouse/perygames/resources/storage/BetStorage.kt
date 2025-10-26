@@ -25,6 +25,6 @@ class BetStorage(
     }
 
     override fun findByUserIdAndStatusIn(userId: String, status: List<BetStatus>): List<Bet> {
-        return betRepository.findByUserIdAndStatusIn(userId, status.map { it.name })
+        return betRepository.findByUserIdAndStatusIn(userId, status.map { it.name }).map { it.toDomain() }
     }
 }
