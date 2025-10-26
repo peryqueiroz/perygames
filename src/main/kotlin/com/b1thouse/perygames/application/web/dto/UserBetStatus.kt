@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 
 data class UserBetStatus(
     @JsonProperty("hasBetPending", required = true) val hasBetPending : Boolean,
-    @JsonProperty("currentBet") val currentBet : CurrentBet
+    @JsonProperty("currentBet") val currentBet : CurrentBet? = null
 )
 
 data class CurrentBet(

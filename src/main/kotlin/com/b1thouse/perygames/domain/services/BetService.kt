@@ -121,7 +121,7 @@ class BetService(
         }
     }
     fun hasPendingBet(userId: String): UserBetStatus {
-        betStorageGateway.findByUserIdAndStatusIn(userId, BetStatus.getPendingStatus()).let {
+        betStorageGateway.findByUserIdAndStatusIn(userId, BetStatus.getPendingStatus())?.let {
             logger.info("Bet ${it.size} found for user=$userId . Bet id=${it.first().id}")
             return UserBetStatus(hasBetPending = it.isNotEmpty(), currentBet = CurrentBet(
                 matchId = it.first().id,
@@ -131,6 +131,7 @@ class BetService(
                 createdAt = it.first().createdAt)
             )
         }
+        return UserBetStatus(hasBetPending = false)
     }
 
     private fun isBalanceValidForBet(user: UserBet, betDTO: BetDTO): Boolean {

@@ -24,7 +24,7 @@ class BetStorage(
         return betRepository.findByIdOrNull(id)?.toDomain()
     }
 
-    override fun findByUserIdAndStatusIn(userId: String, status: List<BetStatus>): List<Bet> {
-        return betRepository.findByUserIdAndStatusIn(userId, status.map { it.name }).map { it.toDomain() }
+    override fun findByUserIdAndStatusIn(userId: String, status: List<BetStatus>): List<Bet>? {
+        return betRepository.findByUserIdAndStatusIn(userId, status.map { it.name })?.map { it.toDomain() }
     }
 }
